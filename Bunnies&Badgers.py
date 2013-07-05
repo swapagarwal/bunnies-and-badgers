@@ -170,7 +170,7 @@ while running:
         running=0
         exitcode=0
     if acc[1]!=0:
-        accuracy=acc[0]*1.0/acc[1]*100
+        accuracy=round(acc[0]*1.0/acc[1]*100,2)
     else:
         accuracy=0
 # 11 - Win/lose display        
