@@ -1,4 +1,6 @@
-# 1 - Import library
+# 0 loop_fix branch
+
+ # 1 - Import library
 import pygame
 from pygame.locals import *
 import math
@@ -67,19 +69,18 @@ def main():
         playerpos1 = (playerpos[0]-playerrot.get_rect().width/2, playerpos[1]-playerrot.get_rect().height/2)
         screen.blit(playerrot, playerpos1)
         # 6.2 - Draw arrows
-        for bullet in arrows:
-            index=0
+        for bullet in list(arrows):
             velx=math.cos(bullet[0])*10
             vely=math.sin(bullet[0])*10
             bullet[1]+=velx
             bullet[2]+=vely
             if bullet[1]<-64 or bullet[1]>640 or bullet[2]<-64 or bullet[2]>480:
-                arrows.pop(index)
-            index+=1
-            for projectile in arrows:
-                arrow1 = pygame.transform.rotate(arrow, 360-projectile[0]*57.29)
-                screen.blit(arrow1, (projectile[1], projectile[2]))
-        # 6.3 - Draw badgers
+                arrows.remove(bullet)
+        for projectile in arrows:
+            arrow1 = pygame.transform.rotate(arrow, 360-projectile[0]*57.29)
+            screen.blit(arrow1, (projectile[1], projectile[2]))
+        
+	# 6.3 - Draw badgers
         if badtimer==0:
             badguys.append([640, random.randint(50,430)])
             badtimer=100-(badtimer1*2)
@@ -87,10 +88,9 @@ def main():
                 badtimer1=35
             else:
                 badtimer1+=5
-        index=0
-        for badguy in badguys:
+        for badguy in list(badguys):
             if badguy[0]<-64:
-                badguys.pop(index)
+                badguys.remove(badguy)
             badguy[0]-=7
             # 6.3.1 - Attack castle
             badrect=pygame.Rect(badguyimg.get_rect())
@@ -99,21 +99,18 @@ def main():
             if badrect.left<64:
                 hit.play()
                 healthvalue -= random.randint(5,20)
-                badguys.pop(index)
+                badguys.remove(badguy)
             #6.3.2 - Check for collisions
-            index1=0
-            for bullet in arrows:
+            for bullet in list(arrows):
                 bullrect=pygame.Rect(arrow.get_rect())
                 bullrect.left=bullet[1]
                 bullrect.top=bullet[2]
                 if badrect.colliderect(bullrect):
                     enemy.play()
                     acc[0]+=1
-                    badguys.pop(index)
-                    arrows.pop(index1)
-                index1+=1
+                    badguys.remove(badguy)
+                    arrows.remove(bullet)
             # 6.3.3 - Next bad guy
-            index+=1
         for badguy in badguys:
             screen.blit(badguyimg, badguy)
         # 6.4 - Draw clock
