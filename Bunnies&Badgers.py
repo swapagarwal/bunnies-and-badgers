@@ -47,6 +47,7 @@ def main():
     healthvalue=194
     timestart = pygame.time.get_ticks()
     pygame.mixer.music.play(-1, 0.0)
+    num_arrows = 100
 
     running = 1
     exitcode = 0
@@ -76,11 +77,14 @@ def main():
             bullet[2]+=vely
             if bullet[1]<-64 or bullet[1]>640 or bullet[2]<-64 or bullet[2]>480:
                 arrows.remove(bullet)
+                num_arrows -= 1
+                if num_arrows <= 0:
+                    running = 0
         for projectile in arrows:
             arrow1 = pygame.transform.rotate(arrow, 360-projectile[0]*57.29)
             screen.blit(arrow1, (projectile[1], projectile[2]))
         
-	# 6.3 - Draw badgers
+       # 6.3 - Draw badgers
         if badtimer==0:
             badguys.append([640, random.randint(50,430)])
             badtimer=100-(badtimer1*2)
@@ -120,6 +124,10 @@ def main():
         textRect = survivedtext.get_rect()
         textRect.topright=[635,5]
         screen.blit(survivedtext, textRect)
+        arrowstext = font.render("Remaining arrows: " + str(num_arrows), True, (0,0,0))
+        arrowsTextRect = arrowstext.get_rect()
+        arrowsTextRect.topright = [635, 20]
+        screen.blit(arrowstext, arrowsTextRect)
         # 6.5 - Draw health bar
         screen.blit(healthbar, (5,5))
         for health1 in range(healthvalue):
@@ -181,7 +189,13 @@ def main():
     pygame.font.init()
     font = pygame.font.Font(None, 24)
     elapsedtime = pygame.time.get_ticks()-timestart/1000
-    text = font.render("Score: "+str(accuracy)+"% (Accuracy) * "+str(elapsedtime/1000)+" (Time) = "+str(int(accuracy*elapsedtime/1000)), True, (0,255,0))
+
+    game_over_message = ""
+    if num_arrows <= 0:
+        game_over_message = "You have run out of arrows!!! "
+    game_over_message += "Score: "+str(accuracy)+"% (Accuracy) * "+str(elapsedtime/1000)+" (Time) = "+str(int(accuracy*elapsedtime/1000))
+    text = font.render(game_over_message, True, (0, 255, 0))
+
     textRect = text.get_rect()
     textRect.centerx = screen.get_rect().centerx
     textRect.centery = screen.get_rect().centery+24
